@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parish Calendar &mdash; Activity Scheduler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="masthead no-print">
+  <div class="masthead-inner">
+    <p class="eyebrow">Order of Service &middot; Planning Desk</p>
+    <h1>The Parish Calendar</h1>
+    <p class="subtitle">Log every gathering, print a clean bulletin.</p>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- FORM -->
+  <section class="card form-card no-print" id="formCard">
+    <div class="card-tab" id="formTab">New Entry</div>
+    <h2 id="formTitle">Add an Activity</h2>
+    <form id="activityForm" novalidate>
+      <input type="hidden" id="activityId">
+
+      <div class="field-row">
+        <div class="field">
+          <label for="date">Activity Date</label>
+          <input type="date" id="date" required>
+        </div>
+        <div class="field">
+          <label for="type">Type of Activity</label>
+          <select id="type" required>
+            <option value="" disabled selected>Choose one&hellip;</option>
+            <option>Devotional</option>
+            <option>Physical</option>
+            <option>Fellowship</option>
+            <option>Outreach</option>
+            <option>Educational</option>
+            <option>Service</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field" id="otherTypeField" hidden>
+        <label for="otherType">Specify Type</label>
+        <input type="text" id="otherType" placeholder="e.g. Fundraiser, Retreat">
+      </div>
+
+      <div class="field">
+        <label for="name">Activity Name</label>
+        <input type="text" id="name" placeholder="e.g. Youth Bible Study" required>
+      </div>
+
+      <div class="field">
+        <label for="theme">Theme</label>
+        <input type="text" id="theme" placeholder="e.g. &ldquo;Faith Over Fear&rdquo;">
+      </div>
+
+      <div class="field">
+        <label for="description">Description</label>
+        <textarea id="description" rows="3" placeholder="What's happening, who's leading, what to bring&hellip;"></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" id="submitBtn">Add to Calendar</button>
+        <button type="button" class="btn btn-ghost" id="cancelEditBtn" hidden>Cancel</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- SCHEDULE -->
+  <section class="schedule-section">
+    <div class="schedule-header no-print">
+      <div class="view-toggle" role="tablist" aria-label="View mode">
+        <button class="toggle-btn active" data-view="list" id="btnList">List</button>
+        <button class="toggle-btn" data-view="calendar" id="btnCalendar">Calendar</button>
+      </div>
+
+      <div class="filter-chips" id="filterChips"></div>
+
+      <button class="btn btn-outline" id="printBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / Save PDF
+      </button>
+    </div>
+
+    <div id="emptyState" class="empty-state">
+      <p class="empty-mark">&#10022;</p>
+      <p>No activities scheduled yet.</p>
+      <p class="empty-sub">Fill out the form above to add your first one.</p>
+    </div>
+
+    <!-- Printable masthead, only visible on paper -->
+    <div class="print-only print-masthead">
+      <h1>Parish Activity Schedule</h1>
+      <p id="printDateRange"></p>
+    </div>
+
+    <div id="listView" class="list-view"></div>
+    <div id="calendarView" class="calendar-view" hidden></div>
+  </section>
+
+</main>
+
+<footer class="no-print">
+  <p>Saved automatically in this browser &middot; export-friendly for printing</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

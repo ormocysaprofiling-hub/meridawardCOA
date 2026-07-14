@@ -1,0 +1,499 @@
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --ink:        #1B2A4A;
+  --ink-soft:   #4A5A78;
+  --paper:      #FAF7F0;
+  --paper-dim:  #F1ECDF;
+  --line:       #DCD5C2;
+  --brass:      #A9812F;
+  --brass-dark: #7E5F1F;
+  --sage:       #5B7B62;
+  --clay:       #A15C38;
+  --plum:       #6B4C6B;
+  --slate:      #4A6B7A;
+  --white:      #FFFFFF;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body:    "Source Sans 3", -apple-system, sans-serif;
+  --font-mono:    "IBM Plex Mono", monospace;
+
+  --radius: 3px;
+  --shadow-card: 0 1px 2px rgba(27,42,74,0.06), 0 6px 20px -8px rgba(27,42,74,0.15);
+}
+
+*{ box-sizing: border-box; }
+html{ -webkit-font-smoothing: antialiased; }
+
+body{
+  margin: 0;
+  background: var(--paper-dim);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+.print-only{ display: none; }
+
+/* ============================================================
+   MASTHEAD
+   ============================================================ */
+.masthead{
+  background: var(--ink);
+  color: var(--paper);
+  padding: 3rem 1.5rem 3.5rem;
+  position: relative;
+}
+.masthead::after{
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--brass), var(--sage) 33%, var(--clay) 66%, var(--plum));
+}
+.masthead-inner{ max-width: 880px; margin: 0 auto; }
+.eyebrow{
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin: 0 0 0.6rem;
+  font-weight: 600;
+}
+.masthead h1{
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2rem, 5vw, 2.9rem);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.subtitle{
+  margin: 0.5rem 0 0;
+  color: #C9CEDB;
+  font-size: 1.02rem;
+  font-style: italic;
+  font-family: var(--font-display);
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.wrap{
+  max-width: 880px;
+  margin: -2rem auto 0;
+  padding: 0 1.5rem 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================================================
+   FORM CARD
+   ============================================================ */
+.card{
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+.form-card{
+  padding: 2rem 2rem 1.8rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+  border-top: 3px solid var(--brass);
+}
+.card-tab{
+  position: absolute;
+  top: -13px;
+  left: 2rem;
+  background: var(--brass);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0.22rem 0.7rem;
+  border-radius: 2px;
+}
+.form-card h2{
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.4rem;
+  margin: 0.6rem 0 1.4rem;
+  color: var(--ink);
+}
+
+.field-row{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem;
+}
+.field{ margin-bottom: 1.1rem; }
+.field label{
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+.field input[type="text"],
+.field input[type="date"],
+.field select,
+.field textarea{
+  width: 100%;
+  padding: 0.62rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--paper);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field textarea{ resize: vertical; }
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+  outline: none;
+  border-color: var(--brass);
+  box-shadow: 0 0 0 3px rgba(169,129,47,0.18);
+  background: var(--white);
+}
+
+.form-actions{
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 0.4rem;
+}
+
+.btn{
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 0.65rem 1.3rem;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: transform 0.1s ease, background 0.15s, border-color 0.15s;
+}
+.btn:active{ transform: translateY(1px); }
+.btn-primary{ background: var(--ink); color: var(--paper); }
+.btn-primary:hover{ background: #263C64; }
+.btn-ghost{ background: transparent; color: var(--ink-soft); border-color: var(--line); }
+.btn-ghost:hover{ border-color: var(--ink-soft); }
+.btn-outline{ background: var(--white); color: var(--ink); border-color: var(--line); }
+.btn-outline:hover{ border-color: var(--brass); color: var(--brass-dark); }
+
+/* ============================================================
+   SCHEDULE HEADER / TOGGLES
+   ============================================================ */
+.schedule-header{
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 1.4rem;
+}
+.view-toggle{
+  display: inline-flex;
+  background: var(--paper-dim);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 3px;
+}
+.toggle-btn{
+  border: none;
+  background: transparent;
+  padding: 0.42rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: var(--ink-soft);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.toggle-btn.active{ background: var(--ink); color: var(--paper); }
+
+.filter-chips{
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.chip{
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.3rem 0.65rem;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-weight: 600;
+  user-select: none;
+}
+.chip.active{ color: var(--white); border-color: transparent; }
+.chip[data-type="Devotional"].active{ background: var(--sage); }
+.chip[data-type="Physical"].active{ background: var(--clay); }
+.chip[data-type="Fellowship"].active{ background: var(--brass-dark); }
+.chip[data-type="Outreach"].active{ background: var(--plum); }
+.chip[data-type="Educational"].active{ background: var(--slate); }
+.chip[data-type="Service"].active{ background: var(--ink); }
+.chip[data-type="Other"].active{ background: #7A7A7A; }
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.empty-state{
+  text-align: center;
+  padding: 3.5rem 1rem;
+  color: var(--ink-soft);
+}
+.empty-mark{ color: var(--brass); font-size: 1.4rem; margin: 0 0 0.3rem; }
+.empty-sub{ font-size: 0.85rem; opacity: 0.75; }
+
+/* ============================================================
+   LIST VIEW
+   ============================================================ */
+.month-group{ margin-bottom: 1.8rem; }
+.month-label{
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--brass-dark);
+  font-weight: 700;
+  margin: 0 0 0.7rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.activity-card{
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 1.1rem 1.2rem 1.1rem 1.3rem;
+  margin-bottom: 0.7rem;
+  display: grid;
+  grid-template-columns: 84px 1fr auto;
+  gap: 1.1rem;
+  align-items: start;
+  border-left: 4px solid var(--brass);
+  position: relative;
+}
+.activity-card[data-type="Devotional"]{ border-left-color: var(--sage); }
+.activity-card[data-type="Physical"]{ border-left-color: var(--clay); }
+.activity-card[data-type="Fellowship"]{ border-left-color: var(--brass-dark); }
+.activity-card[data-type="Outreach"]{ border-left-color: var(--plum); }
+.activity-card[data-type="Educational"]{ border-left-color: var(--slate); }
+.activity-card[data-type="Service"]{ border-left-color: var(--ink); }
+.activity-card[data-type="Other"]{ border-left-color: #7A7A7A; }
+
+.card-date{
+  font-family: var(--font-mono);
+  text-align: center;
+  line-height: 1.15;
+}
+.card-date .dow{ font-size: 0.62rem; text-transform: uppercase; color: var(--ink-soft); letter-spacing: 0.06em; }
+.card-date .dom{ font-size: 1.7rem; font-weight: 600; color: var(--ink); }
+.card-date .mon{ font-size: 0.68rem; text-transform: uppercase; color: var(--ink-soft); }
+
+.card-body h3{
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 600;
+  margin: 0 0 0.15rem;
+}
+.card-theme{
+  font-style: italic;
+  color: var(--brass-dark);
+  font-size: 0.88rem;
+  margin: 0 0 0.4rem;
+  font-family: var(--font-display);
+}
+.card-desc{
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  margin: 0;
+  white-space: pre-wrap;
+}
+.type-badge{
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  padding: 0.18rem 0.55rem;
+  border-radius: 20px;
+  background: var(--paper-dim);
+  color: var(--ink-soft);
+  margin-top: 0.5rem;
+}
+
+.card-actions{
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.icon-btn{
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 4px;
+  display: flex;
+}
+.icon-btn:hover{ background: var(--paper-dim); color: var(--ink); }
+
+/* ============================================================
+   CALENDAR VIEW
+   ============================================================ */
+.cal-month{ margin-bottom: 2.2rem; }
+.cal-month-title{
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 0.8rem;
+  color: var(--ink);
+}
+.cal-grid{
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  background: var(--white);
+  padding: 0.7rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+.cal-dow{
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink-soft);
+  padding-bottom: 0.3rem;
+  letter-spacing: 0.05em;
+}
+.cal-cell{
+  min-height: 74px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 0.3rem;
+  background: var(--paper);
+}
+.cal-cell.empty{ background: transparent; border-color: transparent; }
+.cal-cell .cell-num{
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.cal-pill{
+  font-size: 0.62rem;
+  margin-top: 3px;
+  padding: 1px 5px;
+  border-radius: 8px;
+  background: var(--sage);
+  color: var(--white);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: default;
+  font-weight: 600;
+}
+.cal-pill[data-type="Physical"]{ background: var(--clay); }
+.cal-pill[data-type="Fellowship"]{ background: var(--brass-dark); }
+.cal-pill[data-type="Outreach"]{ background: var(--plum); }
+.cal-pill[data-type="Educational"]{ background: var(--slate); }
+.cal-pill[data-type="Service"]{ background: var(--ink); }
+.cal-pill[data-type="Other"]{ background: #7A7A7A; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  opacity: 0.7;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 620px){
+  .field-row{ grid-template-columns: 1fr; }
+  .activity-card{ grid-template-columns: 56px 1fr; }
+  .card-actions{ grid-column: 1 / -1; flex-direction: row; justify-content: flex-end; }
+  .cal-grid{ grid-template-columns: repeat(7, minmax(0,1fr)); }
+  .cal-cell{ min-height: 56px; }
+}
+
+/* ============================================================
+   PRINT
+   ============================================================ */
+@media print{
+  .no-print{ display: none !important; }
+  .print-only{ display: block !important; }
+
+  body{ background: var(--white); }
+  .wrap{ max-width: 100%; margin: 0; padding: 0 0.3in; }
+
+  .print-masthead{
+    text-align: center;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 0.3in;
+    margin-bottom: 0.3in;
+  }
+  .print-masthead h1{
+    font-family: var(--font-display);
+    font-size: 22pt;
+    margin: 0 0 4pt;
+    color: var(--ink);
+  }
+  .print-masthead p{
+    font-family: var(--font-mono);
+    font-size: 9pt;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .calendar-view{ display: none !important; }
+  .list-view{ display: block !important; }
+
+  .month-label{ break-after: avoid; margin-top: 10pt; }
+  .month-group{ break-inside: avoid-page; }
+
+  .activity-card{
+    box-shadow: none;
+    border: 1px solid #ccc;
+    border-left: 4px solid var(--ink);
+    break-inside: avoid;
+    padding: 10pt 12pt;
+    margin-bottom: 8pt;
+  }
+  .card-actions{ display: none !important; }
+  .card-date .dom{ font-size: 16pt; }
+
+  a[href]:after{ content: ""; }
+}
+
+@page{
+  size: auto;
+  margin: 0.5in;
+}
