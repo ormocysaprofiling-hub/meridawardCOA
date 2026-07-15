@@ -1,12 +1,18 @@
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "parish-calendar-activities";
-  const TYPE_ORDER = ["Devotional", "Physical", "Fellowship", "Outreach", "Educational", "Service", "Other"];
+  const STORAGE_KEY = "gic-calendar-activities";
+  const TYPE_ORDER = ["Physical", "Spiritual", "Family History"];
   const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   const DOW_NAMES = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
-  /** @type {{id:string, date:string, name:string, theme:string, description:string, type:string}[]} */
+  const TYPE_ICONS = {
+    "Physical": '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>',
+    "Spiritual": '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>',
+    "Family History": '<circle cx="12" cy="9" r="5"></circle><line x1="12" y1="14" x2="12" y2="21"></line>'
+  };
+
+  /** @type {{id:string, date:string, name:string, theme:string, description:string, type:string, venue:string}[]} */
   let activities = load();
   let activeFilters = new Set(); // empty = show all
   let currentView = "list";
@@ -35,9 +41,8 @@
   const form = document.getElementById("activityForm");
   const dateInput = document.getElementById("date");
   const typeSelect = document.getElementById("type");
-  const otherTypeField = document.getElementById("otherTypeField");
-  const otherTypeInput = document.getElementById("otherType");
   const nameInput = document.getElementById("name");
+  const venueInput = document.getElementById("venue");
   const themeInput = document.getElementById("theme");
   const descInput = document.getElementById("description");
   const idInput = document.getElementById("activityId");
@@ -56,28 +61,21 @@
   const printDateRange = document.getElementById("printDateRange");
 
   // ---------- form behavior ----------
-  typeSelect.addEventListener("change", () => {
-    otherTypeField.hidden = typeSelect.value !== "Other";
-    if (typeSelect.value === "Other") otherTypeInput.focus();
-  });
-
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     if (!dateInput.value || !typeSelect.value || !nameInput.value.trim()) {
       form.reportValidity();
       return;
     }
-    const resolvedType = typeSelect.value === "Other"
-      ? (otherTypeInput.value.trim() || "Other")
-      : typeSelect.value;
 
     const record = {
       id: editingId || String(Date.now()) + Math.random().toString(16).slice(2),
       date: dateInput.value,
       name: nameInput.value.trim(),
+      venue: venueInput.value.trim(),
       theme: themeInput.value.trim(),
       description: descInput.value.trim(),
-      type: resolvedType,
+      type: typeSelect.value,
     };
 
     if (editingId) {
@@ -96,7 +94,6 @@
 
   function resetForm() {
     form.reset();
-    otherTypeField.hidden = true;
     idInput.value = "";
     editingId = null;
     submitBtn.textContent = "Add to Calendar";
@@ -112,17 +109,10 @@
     idInput.value = id;
     dateInput.value = a.date;
     nameInput.value = a.name;
+    venueInput.value = a.venue || "";
     themeInput.value = a.theme;
     descInput.value = a.description;
-
-    if (TYPE_ORDER.includes(a.type) && a.type !== "Other") {
-      typeSelect.value = a.type;
-      otherTypeField.hidden = true;
-    } else {
-      typeSelect.value = "Other";
-      otherTypeField.hidden = false;
-      otherTypeInput.value = a.type;
-    }
+    typeSelect.value = TYPE_ORDER.includes(a.type) ? a.type : TYPE_ORDER[0];
 
     submitBtn.textContent = "Save Changes";
     cancelEditBtn.hidden = false;
@@ -163,9 +153,9 @@
     orderedTypes.forEach(type => {
       const chip = document.createElement("button");
       chip.className = "chip" + (activeFilters.has(type) ? " active" : "");
-      chip.textContent = type;
-      chip.dataset.type = type;
       chip.type = "button";
+      chip.dataset.type = type;
+      chip.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${TYPE_ICONS[type] || ""}</svg><span>${escapeHtml(type)}</span>`;
       chip.addEventListener("click", () => {
         activeFilters.has(type) ? activeFilters.delete(type) : activeFilters.add(type);
         renderAll();
@@ -191,6 +181,66 @@
     return (str || "").replace(/[&<>"']/g, c => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
     }[c]));
+  }
+
+  function typeIconSvg(type) {
+    return `<svg class="type-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${TYPE_ICONS[type] || ""}</svg>`;
+  }
+
+  function countdownLabel(iso) {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const d = parseLocalDate(iso);
+    const diffDays = Math.round((d - today) / 86400000);
+    if (diffDays === 0) return { text: "Today", cls: "today" };
+    if (diffDays < 0) return { text: `${Math.abs(diffDays)}d ago`, cls: "past" };
+    if (diffDays === 1) return { text: "Tomorrow", cls: "soon" };
+    if (diffDays <= 7) return { text: `In ${diffDays}d`, cls: "soon" };
+    return { text: `In ${diffDays}d`, cls: "" };
+  }
+
+  function mapsUrl(venue) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venue)}`;
+  }
+
+  // ---------- .ics export (add a single activity to a phone calendar) ----------
+  function toIcsDate(iso) {
+    return iso.replace(/-/g, "");
+  }
+
+  function downloadIcs(a) {
+    const dt = toIcsDate(a.date);
+    const uid = `${a.id}@gathering-in-christ`;
+    const stamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const lines = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Gathering in Christ//Activity Calendar//EN",
+      "BEGIN:VEVENT",
+      `UID:${uid}`,
+      `DTSTAMP:${stamp}`,
+      `DTSTART;VALUE=DATE:${dt}`,
+      `DTEND;VALUE=DATE:${dt}`,
+      `SUMMARY:${icsEscape(a.name)}`,
+      a.venue ? `LOCATION:${icsEscape(a.venue)}` : null,
+      (a.theme || a.description) ? `DESCRIPTION:${icsEscape([a.theme, a.description].filter(Boolean).join(" — "))}` : null,
+      "END:VEVENT",
+      "END:VCALENDAR"
+    ].filter(Boolean);
+
+    const blob = new Blob([lines.join("\r\n")], { type: "text/calendar" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${a.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "activity"}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function icsEscape(str) {
+    return (str || "").replace(/[\\;,]/g, m => "\\" + m).replace(/\n/g, "\\n");
   }
 
   // ---------- render: list ----------
@@ -219,6 +269,7 @@
         monthContainer = group;
       }
 
+      const cd = countdownLabel(a.date);
       const card = document.createElement("article");
       card.className = "activity-card";
       card.dataset.type = a.type;
@@ -227,14 +278,19 @@
           <div class="dow">${DOW_NAMES[d.getDay()]}</div>
           <div class="dom">${String(d.getDate()).padStart(2, "0")}</div>
           <div class="mon">${MONTH_NAMES[d.getMonth()].slice(0,3)}</div>
+          <span class="countdown ${cd.cls}">${cd.text}</span>
         </div>
         <div class="card-body">
-          <h3>${escapeHtml(a.name)}</h3>
+          <h3>${typeIconSvg(a.type)}<span>${escapeHtml(a.name)}</span></h3>
+          ${a.venue ? `<p class="card-venue"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><a href="${mapsUrl(a.venue)}" target="_blank" rel="noopener">${escapeHtml(a.venue)}</a></p>` : ""}
           ${a.theme ? `<p class="card-theme">&ldquo;${escapeHtml(a.theme)}&rdquo;</p>` : ""}
           ${a.description ? `<p class="card-desc">${escapeHtml(a.description)}</p>` : ""}
           <span class="type-badge">${escapeHtml(a.type)}</span>
         </div>
         <div class="card-actions no-print">
+          <button class="icon-btn" title="Add to phone calendar" data-action="ics" data-id="${a.id}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 14v4"/><path d="M10 16h4"/></svg>
+          </button>
           <button class="icon-btn" title="Edit" data-action="edit" data-id="${a.id}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
           </button>
@@ -250,6 +306,11 @@
       btn.addEventListener("click", () => startEdit(btn.dataset.id)));
     listView.querySelectorAll('[data-action="delete"]').forEach(btn =>
       btn.addEventListener("click", () => deleteActivity(btn.dataset.id)));
+    listView.querySelectorAll('[data-action="ics"]').forEach(btn =>
+      btn.addEventListener("click", () => {
+        const a = activities.find(x => x.id === btn.dataset.id);
+        if (a) downloadIcs(a);
+      }));
   }
 
   // ---------- render: calendar ----------
@@ -309,7 +370,7 @@
               const pill = document.createElement("div");
               pill.className = "cal-pill";
               pill.dataset.type = a.type;
-              pill.title = `${a.name} (${a.type})`;
+              pill.title = a.venue ? `${a.name} (${a.type}) — ${a.venue}` : `${a.name} (${a.type})`;
               pill.textContent = a.name;
               cell.appendChild(pill);
             });
